@@ -1,0 +1,91 @@
+﻿@page "/ProdutosListar"
+@using Microsoft.AspNetCore.Components.Forms
+@using BlazorEcomm.Shared.Models
+@inject HttpClient httpClient
+
+
+
+<h3>Lista de Produtos</h3>
+
+<div class="shadow p-3 text-center">
+    @msg
+
+        <div class="d-flex mb-4  text-center">
+            <input class="form-control me-2 fs-5" type="search" placeholder="Pesquisar por Nome" aria-label="Pesquisar" @bind="nome" style="width: 250px;">
+            <button class="btn btn-success me-2" @onclick="Carregar">
+                <i class="bi bi-search fs-5"></i>
+            </button>
+        </div>
+    <table class="table table-striped ">
+        <thead>
+            <tr>
+                <th style="text-align:end">#</th>
+                <th style="text-align:center">Nome</th>
+                <th style="text-align:left">Preço</th>
+                <th style="text-align:left">Quantidade</th>
+                <th style="text-align:center">Imagem</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (true)
+            {
+                foreach (Produto p in produtos)
+                {
+                    <tr>
+                        <td style="text-align:end">@p.Id</td>
+                        <td style="text-align:center">@p.Nome</td>
+                        <td style="text-align:left">@p.Preco.ToString("C")</td>
+                        <td style="text-align:left">@p.Quantidade</td>
+                        <td>
+                            <img src="@p.Imagem" width="200" />
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+
+     <button class="btn btn-primary" @onclick="Carregar">Lista Completa</button> 
+</div>
+
+
+@code {
+    private List<Produto>? produtos = new();
+
+    string msg = "";
+    string nome = "";
+
+
+
+
+    protected async Task Carregar()
+    {
+        string api = "api/produtos/listar";
+
+        if (!string.IsNullOrEmpty(nome))
+        {
+            api = $"api/produtos/listar?nome={nome}";
+        }
+
+
+        var response = await httpClient.GetAsync(api);
+
+        if (response.IsSuccessStatusCode)
+        {
+            produtos = await response.Content.ReadFromJsonAsync<List<Produto>>();
+            if (produtos == null || produtos.Count == 0)
+            {
+                msg = "Erro na consulta.";
+                msg = "Não há produtos cadastrado.";
+            }
+
+        } else
+        {
+            msg = "Não foi possivel ler os dados";
+
+        }
+    }
+
+
+}

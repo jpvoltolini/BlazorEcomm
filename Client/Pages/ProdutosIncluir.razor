@@ -1,0 +1,75 @@
+﻿@page "/ProdutosIncluir"
+@using Microsoft.AspNetCore.Components.Forms
+@using BlazorEcomm.Shared.Models
+@inject HttpClient httpClient
+
+
+
+<h3>Inserção de Produto</h3>
+
+<div class="shadow p-3">
+
+    @* Model aponta para uma instancia *@
+    <EditForm Model="produto" OnValidSubmit="Incluir" class="d-flex flex-column">
+
+        <label>
+            Nome:
+            <InputText class="form-control" @bind-Value="produto.Nome"></InputText>
+            <br/>
+        </label>
+
+        <label>
+            Preço:
+            <InputNumber TValue="double" class="form-control" @bind-Value="produto.Preco"></InputNumber>
+            <br />
+
+        </label>
+
+        <label>
+            Quantidade:
+            <InputNumber TValue="double" class="form-control" @bind-Value="produto.Quantidade"></InputNumber>
+            <br />
+
+        </label>
+
+        <label>
+            Imagem:
+            <InputTextArea class="form-control" @bind-Value="produto.Imagem" ></InputTextArea>
+            <br />
+
+        </label>
+        <div>
+            <button class="btn btn-primary" type="submit"> Incluir </button>
+
+        </div>
+        <div>
+           <h3>
+
+           @msg
+           </h3> 
+        </div>
+    </EditForm>
+
+</div>
+
+@code {
+    Produto produto = new();
+
+    string msg = "";
+    private async Task Incluir()
+    {
+        string api = "api/produtos/incluir";
+        HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync<Produto>(api, produto);
+
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            msg = $"\nProduto {produto.Nome} inserido com sucesso.";
+
+            // produto = new();
+        } else
+        {
+            msg = await responseMessage.Content.ReadAsStringAsync();
+        }
+    }
+
+}
