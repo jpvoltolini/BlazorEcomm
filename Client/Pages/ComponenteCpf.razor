@@ -1,0 +1,110 @@
+﻿@page "/ComponenteCpf"
+@using System.Globalization
+@using System.Text // Adicionado para a NormalizationForm
+@using BlazorEcomm.Shared.Models
+@using System.Linq
+
+<h3>    Pesquisa do querido Alexzinho🤏 ❤️🚀</h3>
+<div class="shadow p-3" >
+
+    <input class="form-control" @bind="valorEntrada" @oninput="AtualizarFiltro" placeholder="Digite CPF, CNPJ ou Nome..." />
+
+    <ul class="list-group" style="@(listarResultados ? "display:block;" : "display:none;")">
+        @if (resultadosFiltrados.Any())
+        {
+            @foreach (var resultado in resultadosFiltrados)
+            {
+                <li class="list-group-item" @onclick="() => SelecionarResultado(resultado)">
+                    @($"{resultado.CpfCnpj} - {resultado.Nome}")
+                </li>
+            }
+        } else
+        {
+            <li class="list-group-item">Nenhum resultado encontrado</li>
+            
+        }
+    </ul>
+
+</div>
+
+@code {
+    private string valorEntrada = "";
+    private bool listarResultados = false;
+    private List<Pessoa> pessoas;
+    private List<Pessoa> resultadosFiltrados = new List<Pessoa>();
+
+    protected override void OnInitialized()
+    {
+        // Populando os dados
+        pessoas = new List<Pessoa>
+        {
+            new Pessoa { Nome = "João Silva", CpfCnpj = "111.222.333-44", Tipo = "Física" },
+            new Pessoa { Nome = "Maria Oliveira", CpfCnpj = "555.666.777-88", Tipo = "Física" },
+            new Pessoa { Nome = "Empresa ABC", CpfCnpj = "12.345.678/0001-99", Tipo = "Jurídica" },
+            new Pessoa { Nome = "Carlos Souza", CpfCnpj = "123.456.789-00", Tipo = "Física" },
+            new Pessoa { Nome = "Empresa XYZ", CpfCnpj = "98.765.432/0001-10", Tipo = "Jurídica" },
+            new Pessoa { Nome = "Ana Paula", CpfCnpj = "222.333.444-55", Tipo = "Física" },
+            new Pessoa { Nome = "Pedro Santos", CpfCnpj = "666.777.888-99", Tipo = "Física" },
+            new Pessoa { Nome = "Empresa Tech", CpfCnpj = "01.234.567/0001-23", Tipo = "Jurídica" },
+            new Pessoa { Nome = "Clara Lima", CpfCnpj = "234.567.890-12", Tipo = "Física" },
+            new Pessoa { Nome = "Eduardo Souza", CpfCnpj = "345.678.901-23", Tipo = "Física" },
+            new Pessoa { Nome = "Empresa Alpha", CpfCnpj = "11.222.333/0001-44", Tipo = "Jurídica" },
+            new Pessoa { Nome = "Roberto Carlos", CpfCnpj = "123.789.456-00", Tipo = "Física" },
+            new Pessoa { Nome = "Patricia Lima", CpfCnpj = "456.789.123-88", Tipo = "Física" },
+            new Pessoa { Nome = "Empresa Beta", CpfCnpj = "55.666.777/0001-99", Tipo = "Jurídica" },
+            new Pessoa { Nome = "Fernanda Costa", CpfCnpj = "567.890.123-45", Tipo = "Física" },
+            new Pessoa { Nome = "Marcos Vinicius", CpfCnpj = "678.901.234-56", Tipo = "Física" },
+            new Pessoa { Nome = "Empresa Gamma", CpfCnpj = "77.888.999/0001-11", Tipo = "Jurídica" },
+            new Pessoa { Nome = "Alex ❤️", CpfCnpj = "024.069.123-55", Tipo = "Física" },
+            new Pessoa { Nome = "Zequinha 🤏", CpfCnpj = "024.069.242-69", Tipo = "Física" },
+            new Pessoa { Nome = "Hérickzinho 🚀👌", CpfCnpj = "024.696.242-69", Tipo = "Física" },
+            new Pessoa { Nome = "Sofia Alves", CpfCnpj = "789.012.345-67", Tipo = "Física" },
+            new Pessoa { Nome = "Lucas Mendes", CpfCnpj = "890.123.456-78", Tipo = "Física" },
+            new Pessoa { Nome = "Empresa Omega", CpfCnpj = "99.111.222/0001-33", Tipo = "Jurídica" },
+            new Pessoa { Nome = "Gabriela Dias", CpfCnpj = "901.234.567-89", Tipo = "Física" },
+            new Pessoa { Nome = "Ricardo Ferreira", CpfCnpj = "012.345.678-90", Tipo = "Física" },
+            new Pessoa { Nome = "Empresa Sigma", CpfCnpj = "88.999.000/0001-22", Tipo = "Jurídica" },
+            new Pessoa { Nome = "Juliana Souza", CpfCnpj = "123.456.789-01", Tipo = "Física" },
+            new Pessoa { Nome = "Thiago Lima", CpfCnpj = "234.567.890-12", Tipo = "Física" }
+        };
+    }
+    private string RemoverAcentos(string texto)
+    {
+        if (string.IsNullOrWhiteSpace(texto))
+            return texto;
+
+        return string.Concat(
+            texto.Normalize(NormalizationForm.FormD) // Desconstrói a string em seus componentes de base e diacríticos
+                .Where(ch => CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark)) // Remove os acentos
+            .Normalize(NormalizationForm.FormC); // Recompõe a string sem os acentos
+    }
+
+    private void AtualizarFiltro(ChangeEventArgs e)
+    {
+        valorEntrada = e.Value.ToString();
+        string valorEntradaSemAcentos = RemoverAcentos(valorEntrada);
+
+        if (valorEntrada.Length >= 3)
+        {
+            // Filtrar resultados por CPF, CNPJ ou Nome (ignorando acentos)
+            resultadosFiltrados = pessoas
+                .Where(p => p.CpfCnpj.Contains(valorEntrada) ||
+                            RemoverAcentos(p.Nome).Contains(valorEntradaSemAcentos, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            listarResultados = true;
+        } else
+        {
+            listarResultados = false;
+            resultadosFiltrados.Clear();
+        }
+    }
+
+
+    private void SelecionarResultado(Pessoa pessoa)
+    {
+        // Ao selecionar, exibe o CPF + Nome no campo de entrada
+        valorEntrada = pessoa.CpfCnpj + " - " + pessoa.Nome;
+        listarResultados = false;
+    }
+}

@@ -1,0 +1,20 @@
+﻿@page "/teste"
+@inject IJSRuntime JS;
+
+
+<h3>TesteJs</h3>
+
+<p>Resultado da soma: @result</p>
+<button @onclick="CallJsFunction">Somar com JS</button>
+
+
+
+@code {
+    private int result;
+
+    private async Task CallJsFunction()
+    {
+        // Chama a função 'addNumbers' e captura o retorno
+        result = await JS.InvokeAsync<int>("addNumbers", 5, 7);
+    }
+}

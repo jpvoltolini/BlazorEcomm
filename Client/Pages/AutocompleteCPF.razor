@@ -1,0 +1,168 @@
+﻿@page "/autocomplete"
+@using BlazorEcomm.Shared.Models
+
+<PageTitle>Autocomplete CPF</PageTitle>
+<h2 class="text-center">Autocomplete CPF, CNPJ e Nome</h2>
+<Espacamento_br_hr></Espacamento_br_hr>
+
+<div class="container">
+    <div class="row">
+        <div class="col h-100" style="width: 45%; ">
+            <div class="shadow p-5 h-75 rounded-3" style="width:100%">
+                <div>
+                    <label>
+                        <InputText class="form-control" style="width:300px" @bind-Value="campoPesquisa" @oninput="ValorDigitado" placeholder="Digite CPF, CNPJ ou Nome"></InputText>
+                    </label>
+
+                    <div class="dropdown" style="position:relative; width: 300px;">
+                        @if (listaFiltrada.Any())
+                        {
+                            <ul class="list-group" style="display:block; position:absolute; width:100%; z-index: 1000;">
+                                @foreach (var pessoa in listaFiltrada)
+                                {
+                                    <li class="list-group-item" style="cursor: pointer;" @onclick="() => SelecionarResultado(pessoa)">
+                                        @pessoa.CpfCnpj - @pessoa.Nome
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col text-center" style="width: 45%;">
+            <div class="shadow p-5  rounded-3" style="width:100%">
+                <div>
+                    <input type="radio" class="btn-check" name="options-base" id="option5" autocomplete="off" value="CPF" @onchange="SelecionarFiltro" checked>
+                    <label class="btn btn-outline-secondary" for="option5">CPF</label>
+
+                    <input type="radio" class="btn-check" name="options-base" id="option6" autocomplete="off" value="CNPJ" @onchange="SelecionarFiltro">
+                    <label class="btn btn-outline-secondary" for="option6">CNPJ</label>
+
+                    <input type="radio" class="btn-check" name="options-base" id="option8" autocomplete="off" value="Nome" @onchange="SelecionarFiltro">
+                    <label class="btn btn-outline-secondary" for="option8">Nome</label>
+                    <Espacamento_br_hr />
+                </div>
+
+                <label>
+                    <input class="form-control" style="width:300px" @bind="campoPesquisaCard2" @oninput="PesquisarFiltradoPorTipo" placeholder="Digite CPF, CNPJ ou Nome" />
+                </label>
+
+
+                <div class="dropdown" style="position:relative">
+                    @if (listaFiltradaPorTipo.Any())
+                    {
+                        <ul class="list-group" style="display:block; position:absolute; width:100%; z-index: 1000;">
+                            @foreach (var pessoa in listaFiltradaPorTipo)
+                            {
+                                <li class="list-group-item" style="cursor: pointer;" @onclick="() => SelecionarResultadoCard2(pessoa)">
+                                    @pessoa.CpfCnpj - @pessoa.Nome
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string campoPesquisa = string.Empty;
+    private string campoPesquisaCard2 = string.Empty;
+    private string filtroSelecionado = "CPF";
+
+    private List<Pessoa> pessoas = new List<Pessoa>
+    {
+        new Pessoa { Nome = "João Silva", CpfCnpj = "111.222.333-44", Tipo = "Física" },
+        new Pessoa { Nome = "Maria Oliveira", CpfCnpj = "555.666.777-88", Tipo = "Física" },
+        new Pessoa { Nome = "Empresa ABC", CpfCnpj = "12.345.678/0001-99", Tipo = "Jurídica" },
+        new Pessoa { Nome = "Carlos Souza", CpfCnpj = "123.456.789-00", Tipo = "Física" },
+        new Pessoa { Nome = "Empresa XYZ", CpfCnpj = "98.765.432/0001-10", Tipo = "Jurídica" },
+        new Pessoa { Nome = "Ana Paula", CpfCnpj = "222.333.444-55", Tipo = "Física" },
+        new Pessoa { Nome = "Pedro Santos", CpfCnpj = "666.777.888-99", Tipo = "Física" },
+        new Pessoa { Nome = "Empresa Tech", CpfCnpj = "01.234.567/0001-23", Tipo = "Jurídica" },
+        new Pessoa { Nome = "Clara Lima", CpfCnpj = "234.567.890-12", Tipo = "Física" },
+        new Pessoa { Nome = "Eduardo Souza", CpfCnpj = "345.678.901-23", Tipo = "Física" },
+        new Pessoa { Nome = "Empresa Alpha", CpfCnpj = "11.222.333/0001-44", Tipo = "Jurídica" },
+        new Pessoa { Nome = "Roberto Carlos", CpfCnpj = "123.789.456-00", Tipo = "Física" },
+        new Pessoa { Nome = "Patricia Lima", CpfCnpj = "456.789.123-88", Tipo = "Física" },
+        new Pessoa { Nome = "Empresa Beta", CpfCnpj = "55.666.777/0001-99", Tipo = "Jurídica" },
+        new Pessoa { Nome = "Fernanda Costa", CpfCnpj = "567.890.123-45", Tipo = "Física" },
+        new Pessoa { Nome = "Marcos Vinicius", CpfCnpj = "678.901.234-56", Tipo = "Física" },
+        new Pessoa { Nome = "Empresa Gamma", CpfCnpj = "77.888.999/0001-11", Tipo = "Jurídica" },
+        new Pessoa { Nome = "Sofia Alves", CpfCnpj = "789.012.345-67", Tipo = "Física" },
+        new Pessoa { Nome = "Lucas Mendes", CpfCnpj = "890.123.456-78", Tipo = "Física" },
+        new Pessoa { Nome = "Empresa Omega", CpfCnpj = "99.111.222/0001-33", Tipo = "Jurídica" },
+        new Pessoa { Nome = "Gabriela Dias", CpfCnpj = "901.234.567-89", Tipo = "Física" },
+        new Pessoa { Nome = "Ricardo Ferreira", CpfCnpj = "012.345.678-90", Tipo = "Física" },
+        new Pessoa { Nome = "Empresa Sigma", CpfCnpj = "88.999.000/0001-22", Tipo = "Jurídica" },
+        new Pessoa { Nome = "Juliana Souza", CpfCnpj = "123.456.789-01", Tipo = "Física" },
+        new Pessoa { Nome = "Thiago Lima", CpfCnpj = "234.567.890-12", Tipo = "Física" }
+    };
+
+
+    private List<Pessoa> listaFiltrada = new List<Pessoa>();
+    private List<Pessoa> listaFiltradaPorTipo = new List<Pessoa>();
+
+    private void ValorDigitado(ChangeEventArgs digito)
+    {
+        campoPesquisa = digito.Value.ToString();
+        if (campoPesquisa.Length >= 3)
+        {
+            listaFiltrada = pessoas.Where(a => a.CpfCnpj.Contains(campoPesquisa)
+            || a.Nome.Contains(campoPesquisa, StringComparison.OrdinalIgnoreCase)).ToList();
+        } else
+        {
+            listaFiltrada.Clear();
+        }
+    }
+
+    private void PesquisarFiltradoPorTipo(ChangeEventArgs digito)
+    {
+        campoPesquisaCard2 = digito.Value.ToString();
+
+        if (campoPesquisaCard2.Length >= 3)
+        {
+            if (filtroSelecionado == "CPF")
+            {
+                listaFiltradaPorTipo = pessoas
+                    .Where(p => p.Tipo == "Física" && p.CpfCnpj.Contains(campoPesquisaCard2))
+                    .ToList();
+            } else if (filtroSelecionado == "CNPJ")
+            {
+                listaFiltradaPorTipo = pessoas
+                    .Where(p => p.Tipo == "Jurídica" && p.CpfCnpj.Contains(campoPesquisaCard2))
+                    .ToList();
+            } else if (filtroSelecionado == "Nome")
+            {
+                listaFiltradaPorTipo = pessoas
+                    .Where(p => p.Nome.Contains(campoPesquisaCard2, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+        } else
+        {
+            listaFiltradaPorTipo.Clear();
+        }
+    }
+
+    private void SelecionarResultado(Pessoa pessoa)
+    {
+        campoPesquisa = pessoa.CpfCnpj + " - " + pessoa.Nome;
+        listaFiltrada.Clear();
+    }
+
+    private void SelecionarResultadoCard2(Pessoa pessoa)
+    {
+        campoPesquisaCard2 = pessoa.CpfCnpj + " - " + pessoa.Nome;
+        listaFiltradaPorTipo.Clear();
+    }
+
+    private void SelecionarFiltro(ChangeEventArgs args)
+    {
+        filtroSelecionado = args.Value.ToString();
+        listaFiltradaPorTipo.Clear(); // Limpa a lista ao trocar o filtro
+    }
+}
+

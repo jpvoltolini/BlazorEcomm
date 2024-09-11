@@ -3,59 +3,58 @@
 @using BlazorEcomm.Shared.Models
 @inject HttpClient httpClient
 
-
-
 <h3>Inserção de Produto</h3>
 
 <div class="shadow p-3">
-
     @* Model aponta para uma instancia *@
     <EditForm Model="produto" OnValidSubmit="Incluir" class="d-flex flex-column">
 
         <label>
             Nome:
             <InputText class="form-control" @bind-Value="produto.Nome"></InputText>
-            <br/>
+            <br />
         </label>
 
         <label>
             Preço:
-            <InputNumber TValue="double" class="form-control" @bind-Value="produto.Preco"></InputNumber>
+            @* Use o componente TesteJquery e passe o callback *@
+            <TesteJquery OnPrecoMudou="AtualizarPrecoProduto" />
             <br />
-
         </label>
 
         <label>
             Quantidade:
-            <InputNumber TValue="double" class="form-control" @bind-Value="produto.Quantidade"></InputNumber>
+            <InputNumber  class="form-control" @bind-Value="produto.Quantidade"></InputNumber>
             <br />
-
         </label>
 
         <label>
             Imagem:
-            <InputTextArea class="form-control" @bind-Value="produto.Imagem" ></InputTextArea>
+            <InputTextArea class="form-control" @bind-Value="produto.Imagem"></InputTextArea>
             <br />
-
         </label>
+
         <div>
             <button class="btn btn-primary" type="submit"> Incluir </button>
-
         </div>
-        <div>
-           <h3>
 
-           @msg
-           </h3> 
+        <div>
+            <h3>@msg</h3>
         </div>
     </EditForm>
-
 </div>
 
 @code {
     Produto produto = new();
 
     string msg = "";
+
+    private void AtualizarPrecoProduto(double preco)
+    {
+        // Atualiza o valor do preço no modelo produto
+        produto.Preco = preco;
+    }
+
     private async Task Incluir()
     {
         string api = "api/produtos/incluir";
@@ -63,13 +62,11 @@
 
         if (responseMessage.IsSuccessStatusCode)
         {
-            msg = $"\nProduto {produto.Nome} inserido com sucesso.";
-
-            // produto = new();
+            msg = $"Produto {produto.Nome} inserido com sucesso.";
+            produto = new();
         } else
         {
             msg = await responseMessage.Content.ReadAsStringAsync();
         }
     }
-
 }

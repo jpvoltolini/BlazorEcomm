@@ -1,0 +1,27 @@
+﻿@page "/my-component"
+@inject IJSRuntime JS
+
+<h3>Componente Blazor com jQuery</h3>
+
+<input id="inputElement" @bind="inputValue" />
+
+<p>Valor no Blazor: @inputValue</p>
+
+@code {
+    private string inputValue = "";
+
+    // Este método será invocado do JavaScript via `DotNet.invokeMethodAsync`
+    [JSInvokable]
+    public Task UpdateValueFromJS(string value)
+    {
+        // Atualiza o valor que o Blazor está monitorando
+        inputValue = value;
+        return Task.CompletedTask;
+    }
+
+    // Chama a função JS para alterar o valor do input
+    private async Task UpdateValueFromBlazor()
+    {
+        await JS.InvokeVoidAsync("myComponentInterop.setInputValue", inputValue);
+    }
+}

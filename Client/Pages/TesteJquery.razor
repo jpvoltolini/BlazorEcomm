@@ -1,0 +1,32 @@
+﻿@page "/teste-jquery"
+@inject IJSRuntime JS
+
+<input @ref="moneyInput" class="money form-control" @oninput="AtualizarValor" />
+
+@code {
+    private ElementReference moneyInput;
+
+    [Parameter] public EventCallback<double> OnPrecoMudou { get; set; } // Callback para enviar o valor como double
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Chama a função JavaScript para aplicar a máscara quando o campo for renderizado
+            await JS.InvokeVoidAsync("applyMoneyMask", ".money");
+        }
+    }
+
+    private async Task AtualizarValor(ChangeEventArgs e)
+    {
+        var valorMascara = e.Value.ToString();
+
+
+        if (double.TryParse(valorMascara, out var precoDouble))
+        {
+            // Enviar o valor convertido para o componente pai como double
+            await OnPrecoMudou.InvokeAsync(precoDouble);
+        }
+    }
+
+}

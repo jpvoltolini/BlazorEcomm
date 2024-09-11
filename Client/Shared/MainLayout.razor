@@ -1,19 +1,25 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="px-5 flex-column d-flex vh-100">
+<div class="px-4 flex-column d-flex vh-100">
 
     <div class="bg-dark  text-white text-center p-4">
         <NavLink class="text-decoration-none" href="/ProdutosListar"> Listar Produtos </NavLink> |
         <NavLink class="text-decoration-none" href="/ProdutosIncluir"> Incluir Produtos </NavLink> |
         <NavLink class="text-decoration-none" href="/ProdutosAlterar"> Consultar/Alterar Produtos </NavLink> |
         <NavLink class="text-decoration-none" href="/ProdutosExcluir"> Excluir Produto </NavLink>
+        <br />
+        <NavLink class="text-decoration-none text-white btn btn-info" href="/ChamandoComponentes" > TUDO JUNTO</NavLink>
+        <NavLink class="text-decoration-none text-black btn btn-warning" href="/autocomplete"> Autocomplete</NavLink>
+        <NavLink class="text-decoration-none text-black btn btn-danger" href="/my-component"> Componente teste</NavLink>
+        <br />
+        <hr />
+
+        <NavLink class="text-decoration-none text-black btn btn-success" href="/teste"> JS</NavLink>
+        <NavLink class="text-decoration-none text-black btn btn-outline-warning" href="/teste-jquery"> JQUERY</NavLink>
+
     </div>
 
-    <article class="content py-4 h-100">
+    <article class="content py-3 h-100">
         @Body
     </article>
-
-    <div class="bg-dark text-white text-center p-4">
-        meu footer
-    </div>
 </div>
